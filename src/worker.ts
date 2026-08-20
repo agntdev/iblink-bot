@@ -63,7 +63,14 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === "/health") {
-      return Response.json({ ok: true, runtime: "cloudflare-workers" });
+      // This endpoint is intentionally dependency-free so an external uptime
+      // probe can detect the most common deployment mistake (a missing Durable
+      // Object binding) before Telegram updates appear to vanish.
+      const ready = Boolean(env.BOT_TOKEN && env.CHAT_DO);
+      return Response.json(
+        { ok: ready, runtime: "cloudflare-workers" },
+        { status: ready ? 200 : 503 },
+      );
     }
 
     if (request.method === "POST" && url.pathname === "/tg") {
@@ -75,8 +82,15 @@ export default {
       ) {
         return new Response("forbidden", { status: 403 });
       }
-      const bot = await getBot(env);
-      return webhookCallback(bot, "cloudflare-mod")(request);
+      try {
+        const bot = await getBot(env);
+        return await webhookCallback(bot, "cloudflare-mod")(request);
+      } catch (err) {
+        // Return a retryable status rather than falsely acknowledging an update
+        // that could not be processed. Telegram will retry webhook delivery.
+        console.error("[agntdev-bot] webhook processing failed:", err);
+        return new Response("temporary failure", { status: 500 });
+      }
     }
 
     return new Response("not found", { status: 404 });

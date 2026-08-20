@@ -8,7 +8,13 @@ registerMainMenuItem({ label: "Manage IBs", data: "ib:desk", order: 40 });
 const composer = new Composer<Ctx>();
 
 async function showStatus(ctx: Ctx): Promise<void> {
-  const profile = await getProfile(ctx);
+  let profile;
+  try {
+    profile = await getProfile(ctx);
+  } catch {
+    await ctx.reply("I couldn’t load your registration right now. Please try again in a moment.");
+    return;
+  }
   if (!profile) { await ctx.reply("No registration yet — tap Register to link your MT5 account."); return; }
   await ctx.reply(`Your MT5 account: ${profile.mt5AccountId}\nLinkage: ${linkageLabel(profile.linkageStatus)}\nCompany: ${profile.company ?? "Not provided"}\nEmail: ${profile.email ?? "Not provided"}\nPhone: ${profile.phone ?? "Not provided"}`, { reply_markup: inlineKeyboard([[inlineButton("Update details", "update:open")]]) });
 }
