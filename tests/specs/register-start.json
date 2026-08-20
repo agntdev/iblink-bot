@@ -6,9 +6,7 @@
         "expect": [
           {
             "method": "sendMessage",
-            "payload": {
-              "text": "Launch registration flow from /start menu"
-            }
+            "payload": { "text": "Add your company name, or tap Skip." }
           }
         ],
         "send": {

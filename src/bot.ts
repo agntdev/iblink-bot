@@ -6,7 +6,11 @@ import type { StorageAdapter } from "grammy";
 // bot grows. Durable domain data must NOT live here — use the toolkit's
 // persistent storage (see AGENTS.md).
 export interface Session {
-  // example: step?: "awaiting_amount";
+  step?: "register_company" | "register_email" | "register_phone" | "register_mt5" | "update_company" | "update_email" | "update_phone";
+  draft?: { company?: string; email?: string; phone?: string };
+  // This fallback exists solely for the tokenless harness. Production profile
+  // data is held by the Durable Object repository in ib.ts.
+  harnessProfile?: import("./ib.js").IbProfile;
 }
 
 export type Ctx = BotContext<Session>;

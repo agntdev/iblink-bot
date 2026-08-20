@@ -6,15 +6,26 @@
         "expect": [
           {
             "method": "sendMessage",
-            "payload": {
-              "text": "Edit optional profile fields"
-            }
+            "payload": { "text": "Register first, then you can update your contact details." }
           }
         ],
         "send": {
           "text": "/update"
         }
       }
+    ]
+  },
+  {
+    "name": "update changes an optional profile field",
+    "steps": [
+      { "send": { "text": "/register" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "text": "12345678" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "text": "/update" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Company: Not provided\nEmail: Not provided\nPhone: Not provided\n\nChoose a field to edit." } }] },
+      { "send": { "callback": "update:company" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Send your new company. Send a dash to clear it." } }] },
+      { "send": { "text": "Northstar Partners" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Your company has been updated." } }] }
     ]
   }
 ]

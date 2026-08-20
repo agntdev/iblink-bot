@@ -6,9 +6,7 @@
         "expect": [
           {
             "method": "sendMessage",
-            "payload": {
-              "text": "View current registration and linkage status"
-            }
+            "payload": { "text": "No registration yet — tap Register to link your MT5 account." }
           }
         ],
         "send": {
