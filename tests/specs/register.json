@@ -6,15 +6,45 @@
         "expect": [
           {
             "method": "sendMessage",
-            "payload": {
-              "text": "Begin registration flow for new IBs"
-            }
+            "payload": { "text": "Add your company name, or tap Skip." }
           }
         ],
         "send": {
           "text": "/register"
         }
       }
+    ]
+  },
+  {
+    "name": "registration accepts skipped optional details and an MT5 account",
+    "steps": [
+      { "send": { "text": "/start" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Welcome to IB registration. Register your MT5 account or manage your details below." } }] },
+      { "send": { "callback": "register:start" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Add your company name, or tap Skip." } }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Add your business email, or tap Skip." } }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Add your phone number, or tap Skip." } }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Send your MT5 account ID." } }] },
+      { "send": { "text": "12345678" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Your registration is saved. Pending MT5 verification. Owner notifications aren’t set up yet." } }] }
+    ]
+  },
+  {
+    "name": "registration rejects an invalid MT5 account ID",
+    "steps": [
+      { "send": { "text": "/register" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "text": "12AB" }, "expect": [{ "method": "sendMessage", "payload": { "text": "MT5 account IDs use 4 to 12 digits. Check the number and try again." } }] }
+    ]
+  },
+  {
+    "name": "a second registration keeps the existing profile",
+    "steps": [
+      { "send": { "text": "/register" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "callback": "register:skip" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "text": "12345678" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "text": "/register" }, "expect": [{ "method": "sendMessage", "payload": { "text": "You’re already registered. Use Status to review your MT5 linkage or Update to change your details." } }] }
     ]
   }
 ]

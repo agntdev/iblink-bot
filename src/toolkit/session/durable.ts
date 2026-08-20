@@ -40,6 +40,7 @@ export interface WorkerEnv {
   WEBHOOK_SECRET?: string;
   CHAT_DO: DONamespace;
   DB?: unknown; // D1 binding (app data); see AGENTS.md
+  ADMIN_CHAT_ID?: string;
   BOT_TELEMETRY_URL?: string;
   BOT_TELEMETRY_SECRET?: string;
   BOT_TELEMETRY_SALT?: string;
@@ -142,6 +143,33 @@ export class ChatDO {
         await this.state.storage.delete("session");
         return new Response(null, { status: 204 });
       }
+    }
+
+    // IB profiles are durable domain data, separate from recyclable sessions.
+    // An explicit index avoids any Redis/Durable Object keyspace enumeration.
+    if (url.pathname === "/ib-profile") {
+      if (request.method === "GET") {
+        const profile = await this.state.storage.get<unknown>("ib-profile");
+        return profile === undefined ? new Response(null, { status: 204 }) : Response.json(profile);
+      }
+      if (request.method === "PUT") {
+        await this.state.storage.put("ib-profile", await request.json());
+        return new Response(null, { status: 204 });
+      }
+      if (request.method === "DELETE") {
+        await this.state.storage.delete("ib-profile");
+        return new Response(null, { status: 204 });
+      }
+    }
+    if (url.pathname === "/ib-index") {
+      const ids = (await this.state.storage.get<number[]>("ib-profile-ids")) ?? [];
+      if (request.method === "GET") return Response.json(ids);
+      const input = (await request.json()) as { telegramId: number };
+      const next = request.method === "POST"
+        ? (ids.includes(input.telegramId) ? ids : [...ids, input.telegramId])
+        : ids.filter((id) => id !== input.telegramId);
+      await this.state.storage.put("ib-profile-ids", next);
+      return new Response(null, { status: 204 });
     }
 
     // Schedule a reminder + (re)arm the alarm to the earliest due one.

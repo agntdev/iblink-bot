@@ -8,7 +8,7 @@
           {
             "method": "sendMessage",
             "payload": {
-              "text": "ℹ️ Tap /start to open the menu, then pick what you want from the buttons.\n\nEverything in this bot is reachable by tapping — you don't need to remember any commands."
+              "text": "Use Register to add your MT5 account.\n\nUse Status to review the linkage, or Update details to change your optional contact information."
             }
           }
         ]
