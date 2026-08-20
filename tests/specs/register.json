@@ -27,6 +27,18 @@
     ]
   },
   {
+    "name": "registration responds at every optional-detail step",
+    "steps": [
+      { "send": { "text": "/start" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Welcome to IB registration. Register your MT5 account or manage your details below." } }] },
+      { "send": { "callback": "register:start" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Add your company name, or tap Skip." } }] },
+      { "send": { "text": "Northstar Partners" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Add your business email, or tap Skip." } }] },
+      { "send": { "text": "ib@northstar.example" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Add your phone number, or tap Skip." } }] },
+      { "send": { "text": "+44 20 7946 0958" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Send your MT5 account ID." } }] },
+      { "send": { "text": "12345678" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Your registration is saved. Pending MT5 verification. Owner notifications aren’t set up yet." } }] },
+      { "send": { "text": "/status" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Your MT5 account: 12345678\nLinkage: Pending MT5 verification\nCompany: Northstar Partners\nEmail: ib@northstar.example\nPhone: +44 20 7946 0958" } }] }
+    ]
+  },
+  {
     "name": "registration rejects an invalid MT5 account ID",
     "steps": [
       { "send": { "text": "/register" }, "expect": [{ "method": "sendMessage" }] },

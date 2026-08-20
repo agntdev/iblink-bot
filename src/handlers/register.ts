@@ -29,7 +29,14 @@ export async function beginRegistration(ctx: Ctx): Promise<void> {
     await ctx.reply("I couldn’t identify your Telegram account. Open this bot in a private chat and try again.");
     return;
   }
-  const existing = await getProfile(ctx);
+  let existing;
+  try {
+    existing = await getProfile(ctx);
+  } catch {
+    clearFlow(ctx);
+    await ctx.reply("I couldn’t check your registration right now. Please try again in a moment.");
+    return;
+  }
   if (existing) {
     clearFlow(ctx);
     await ctx.reply("You’re already registered. Use Status to review your MT5 linkage or Update to change your details.");

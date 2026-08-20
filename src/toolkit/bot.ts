@@ -60,6 +60,15 @@ export function createBot<S extends object>(
   bot.catch((err) => {
     if (opts.onError) opts.onError(err);
     else console.error("[agntdev-bot] unhandled error:", err);
+
+    // A logged exception alone looks like a non-responsive bot to the person
+    // who triggered it. Keep the technical detail in the runtime log, but make
+    // one best-effort attempt to give that person a useful next step. This also
+    // covers failures in middleware such as a temporarily unavailable session
+    // store. Never let a failed Telegram reply recurse into another error.
+    return err.ctx
+      .reply("Something went wrong on our side. Please try again in a moment.")
+      .catch(() => undefined);
   });
   return bot;
 }
